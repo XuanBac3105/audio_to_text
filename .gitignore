@@ -1,0 +1,8 @@
+audio/
+output/
+whisper_cache/
+__pycache__/
+*.pyc
+*.log
+ngrok.exe
+.env
