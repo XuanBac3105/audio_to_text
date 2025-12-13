@@ -22,9 +22,6 @@ RUN pip install --no-cache-dir "numpy<2"
 # Cài whisper và Flask
 RUN pip install --no-cache-dir openai-whisper flask
 
-# Pre-load medium model to avoid download on first run
-RUN python -c "import whisper; whisper.load_model('medium')"
-
 EXPOSE 5000
 
 CMD ["python", "app.py"]
