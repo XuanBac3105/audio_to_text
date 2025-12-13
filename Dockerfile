@@ -19,8 +19,8 @@ RUN pip install --no-cache-dir \
 # Fix numpy version
 RUN pip install --no-cache-dir "numpy<2"
 
-# Cài whisper và Flask
-RUN pip install --no-cache-dir openai-whisper flask
+# Cài faster-whisper (4x nhanh hơn openai-whisper) và librosa (audio preprocessing)
+RUN pip install --no-cache-dir faster-whisper librosa flask
 
 EXPOSE 5000
 
