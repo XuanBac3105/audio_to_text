@@ -1,8 +1,12 @@
-audio/
-output/
 whisper_cache/
+.venv/
+venv/
 __pycache__/
 *.pyc
 *.log
 ngrok.exe
 .env
+/tmp/uploads/*
+/tmp/outputs/*
+audio/
+output/

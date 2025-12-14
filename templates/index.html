@@ -228,11 +228,91 @@
                 <div class="setting-item">
                     <label>🌐 Ngôn ngữ</label>
                     <select id="language">
-                        <option value="vi">Tiếng Việt</option>
-                        <option value="en">English</option>
-                        <option value="ja">日本語</option>
-                        <option value="th">ภาษาไทย</option>
                         <option value="auto">Tự động nhận diện</option>
+                        <optgroup label="Châu Á">
+                            <option value="vi">🇻🇳 Tiếng Việt</option>
+                            <option value="ja">🇯🇵 日本語 (Japanese)</option>
+                            <option value="th">🇹🇭 ภาษาไทย (Thai)</option>
+                            <option value="ko">🇰🇷 한국어 (Korean)</option>
+                            <option value="zh">🇨🇳 中文 (Chinese)</option>
+                            <option value="hi">🇮🇳 हिन्दी (Hindi)</option>
+                            <option value="ta">தமிழ் (Tamil)</option>
+                            <option value="bn">বাংলা (Bengali)</option>
+                            <option value="pa">ਪੰਜਾਬੀ (Punjabi)</option>
+                            <option value="gu">ગુજરાતી (Gujarati)</option>
+                            <option value="mr">मराठी (Marathi)</option>
+                            <option value="te">తెలుగు (Telugu)</option>
+                            <option value="kn">ಕನ್ನಡ (Kannada)</option>
+                            <option value="ml">മലയാളം (Malayalam)</option>
+                            <option value="or">ଓଡିଆ (Odia)</option>
+                            <option value="ur">اردو (Urdu)</option>
+                            <option value="ne">नेपाली (Nepali)</option>
+                            <option value="si">සිංහල (Sinhala)</option>
+                            <option value="my">မြန်မာ (Burmese)</option>
+                            <option value="km">ខ្មែរ (Khmer)</option>
+                            <option value="lo">ລາວ (Lao)</option>
+                            <option value="ms">Bahasa Melayu (Malay)</option>
+                            <option value="id">Bahasa Indonesia (Indonesian)</option>
+                            <option value="fil">Filipino (Tagalog)</option>
+                            <option value="jv">Basa Jawa (Javanese)</option>
+                            <option value="su">Basa Sunda (Sundanese)</option>
+                            <option value="mn">Монгол (Mongolian)</option>
+                        </optgroup>
+                        <optgroup label="Châu Âu">
+                            <option value="en">🇬🇧 English</option>
+                            <option value="es">🇪🇸 Español (Spanish)</option>
+                            <option value="fr">🇫🇷 Français (French)</option>
+                            <option value="de">🇩🇪 Deutsch (German)</option>
+                            <option value="it">🇮🇹 Italiano (Italian)</option>
+                            <option value="pt">🇵🇹 Português (Portuguese)</option>
+                            <option value="ru">🇷🇺 Русский (Russian)</option>
+                            <option value="pl">🇵🇱 Polski (Polish)</option>
+                            <option value="nl">🇳🇱 Nederlands (Dutch)</option>
+                            <option value="sv">🇸🇪 Svenska (Swedish)</option>
+                            <option value="da">🇩🇰 Dansk (Danish)</option>
+                            <option value="no">🇳🇴 Norsk (Norwegian)</option>
+                            <option value="fi">🇫🇮 Suomi (Finnish)</option>
+                            <option value="el">🇬🇷 Ελληνικά (Greek)</option>
+                            <option value="hu">🇭🇺 Magyar (Hungarian)</option>
+                            <option value="cs">🇨🇿 Čeština (Czech)</option>
+                            <option value="ro">🇷🇴 Română (Romanian)</option>
+                            <option value="tr">🇹🇷 Türkçe (Turkish)</option>
+                            <option value="bg">🇧🇬 Български (Bulgarian)</option>
+                            <option value="hr">🇭🇷 Hrvatski (Croatian)</option>
+                            <option value="sr">Српски (Serbian)</option>
+                            <option value="sk">🇸🇰 Slovenčina (Slovak)</option>
+                            <option value="sl">Slovenščina (Slovenian)</option>
+                            <option value="uk">🇺🇦 Українська (Ukrainian)</option>
+                            <option value="be">Беларусь (Belarusian)</option>
+                            <option value="lt">Lietuvių (Lithuanian)</option>
+                            <option value="lv">Latvijas (Latvian)</option>
+                            <option value="et">Eesti (Estonian)</option>
+                            <option value="sq">Shqiptare (Albanian)</option>
+                        </optgroup>
+                        <optgroup label="Trung Đông & Châu Phi">
+                            <option value="ar">العربية (Arabic)</option>
+                            <option value="he">עברית (Hebrew)</option>
+                            <option value="fa">فارسی (Persian)</option>
+                            <option value="am">አማርኛ (Amharic)</option>
+                            <option value="sw">Kiswahili (Swahili)</option>
+                            <option value="ha">Hausa</option>
+                            <option value="yo">Yoruba</option>
+                            <option value="ig">Igbo</option>
+                            <option value="so">Somali</option>
+                            <option value="af">Afrikaans</option>
+                        </optgroup>
+                        <optgroup label="Khác">
+                            <option value="cy">Cymraeg (Welsh)</option>
+                            <option value="is">Íslenska (Icelandic)</option>
+                            <option value="mt">Malti (Maltese)</option>
+                            <option value="lb">Lëtzebuergesch (Luxembourg)</option>
+                            <option value="eu">Euskera (Basque)</option>
+                            <option value="ca">Català (Catalan)</option>
+                            <option value="gl">Galego (Galician)</option>
+                            <option value="fo">Føroyskt (Faroese)</option>
+                            <option value="ga">Gaeilge (Irish)</option>
+                            <option value="la">Latinus (Latin)</option>
+                        </optgroup>
                     </select>
                 </div>
 
@@ -260,6 +340,7 @@
                     <div class="progress-fill" id="progressFill"></div>
                 </div>
                 <div class="progress-text" id="progressText">Đang xử lý...</div>
+                <div class="progress-text" id="elapsedTime" style="margin-top: 10px; color: #666; font-size: 14px;"></div>
             </div>
 
             <div class="log-section" id="logBox">
@@ -357,12 +438,31 @@
                         document.getElementById('progressFill').style.width = percent + '%';
                         document.getElementById('progressText').textContent = 
                             `⏳ Đang xử lý ${status.current}/${status.total} file (${percent}%)`;
+                        
+                        // Display elapsed time
+                        if (status.start_time) {
+                            const elapsed = Math.floor((Date.now() - status.start_time * 1000) / 1000);
+                            const mins = Math.floor(elapsed / 60);
+                            const secs = elapsed % 60;
+                            document.getElementById('elapsedTime').textContent = 
+                                `⏱️ Thời gian đã dùng: ${mins}m ${secs}s`;
+                        }
                     }
                     
                     if (data.logs.some(log => log.includes('DONE'))) {
                         clearInterval(interval);
                         document.getElementById('progressFill').style.width = '100%';
                         document.getElementById('progressText').textContent = '✅ Hoàn thành!';
+                        
+                        // Display final elapsed time
+                        if (status.elapsed_time) {
+                            const mins = Math.floor(status.elapsed_time / 60);
+                            const secs = Math.floor(status.elapsed_time % 60);
+                            document.getElementById('elapsedTime').textContent = 
+                                `⏱️ Thời gian hoàn thành: ${mins}m ${secs}s`;
+                            addLog(`⏱️ TỔNG THỜI GIAN: ${mins}m ${secs}s`);
+                        }
+                        
                         document.getElementById('transcribeBtn').disabled = false;
                         document.getElementById('downloadBtn').style.display = 'block';
                         addLog('🎉 Xử lý hoàn tất! Nhấn nút tải xuống để lấy kết quả.');

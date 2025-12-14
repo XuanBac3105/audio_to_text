@@ -4,9 +4,14 @@ import librosa
 import numpy as np
 import os
 import re
+import time
 from werkzeug.utils import secure_filename
 import threading
 import queue
+import google.generativeai as genai
+from dotenv import load_dotenv
+
+load_dotenv()
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = '/tmp/uploads'
@@ -16,24 +21,35 @@ app.config['MAX_CONTENT_LENGTH'] = 500 * 1024 * 1024  # 500MB
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 os.makedirs(app.config['OUTPUT_FOLDER'], exist_ok=True)
 
-# Dictionary sửa lỗi phổ biến
-corrections = {
-    "dung truyền": "rung chuyển",
-    "chiến trưởng": "chiến trường",
-    "bông kê": "boong kê",
-    "trang trì": "trang bị",
-    "miền chống": "mìn chống",
-    "phủ ký": "phủ kín",
-    "cánh dừng": "cánh rừng",
-    "dậy sống": "dậy sóng",
-    "cơn rông": "cơn dông",
-    "tây nguyên": "Tây Nguyên",
-}
+def proofread_text_with_gemini(text):
+    """
+    Sử dụng Google Gemini để soát lỗi chính tả và ngữ pháp:
+    - Sửa chính tả
+    - Sửa ngữ pháp
+    - Cải thiện câu văn
+    """
+    try:
+        api_key = os.getenv('GOOGLE_GEMINI_API_KEY')
+        if not api_key:
+            log_queue.put("⚠️ Gemini API key không tìm thấy, return text gốc")
+            return text
+        
+        genai.configure(api_key=api_key)
+        model = genai.GenerativeModel('gemini-2.5-flash')
+        
+        # Prompt để sửa chính tả và ngữ pháp
+        prompt = f"""Hãy sửa chính tả, ngữ pháp và cải thiện câu văn cho đoạn text dưới đây. 
+Chỉ trả về văn bản đã được sửa, không giải thích thêm:
 
-def correct_text(text):
-    for wrong, right in corrections.items():
-        text = re.sub(wrong, right, text, flags=re.IGNORECASE)
-    return text
+{text}"""
+        
+        response = model.generate_content(prompt)
+        improved_text = response.text.strip()
+        return improved_text
+        
+    except Exception as e:
+        log_queue.put(f"⚠️ Gemini API lỗi: {str(e)}, dùng text gốc")
+        return text
 
 def preprocess_audio(audio_path):
     """
@@ -67,7 +83,7 @@ def preprocess_audio(audio_path):
 # Global variables
 models_cache = {}
 log_queue = queue.Queue()
-processing_status = {"running": False, "current": 0, "total": 0}
+processing_status = {"running": False, "current": 0, "total": 0, "elapsed_time": 0, "start_time": None}
 
 def load_model(model_size):
     if model_size not in models_cache:
@@ -79,6 +95,7 @@ def process_files(files, language, model_size, output_name):
     global processing_status
     processing_status["running"] = True
     processing_status["total"] = len(files)
+    processing_status["start_time"] = time.time()
     
     log_queue.put(f"Files selected: {len(files)}")
     log_queue.put(f"Model: {model_size} | Language: {language}")
@@ -86,33 +103,42 @@ def process_files(files, language, model_size, output_name):
     log_queue.put("⏳ Bắt đầu transcribe...")
     
     model = load_model(model_size)
+    all_texts = []
+    
+    # PHASE 1: Transcribe tất cả files
+    for idx, file_path in enumerate(files, 1):
+        processing_status["current"] = idx
+        filename = os.path.basename(file_path)
+        log_queue.put(f"[{idx}/{len(files)}] Đang xử lý: {filename}")
+        
+        log_queue.put(f"  📊 Preprocessing audio...")
+        processed_path = preprocess_audio(file_path)
+        
+        log_queue.put(f"  🎤 Transcribing...")
+        segments, info = model.transcribe(
+            processed_path, 
+            language=language if language != "auto" else None,
+            beam_size=5
+        )
+        
+        text = " ".join(segment.text for segment in segments).strip()
+        all_texts.append(f"[{filename}]\n{text}\n")
+        log_queue.put(f"  ✅ Transcribed: {filename}")
+    
+    # PHASE 2: Gộp text và soát lỗi 1 lần bằng Gemini
+    log_queue.put("🤖 Proofing lỗi bằng Gemini...")
+    combined_text = "\n".join(all_texts)
+    proofread_text = proofread_text_with_gemini(combined_text)
+    
+    # PHASE 3: Lưu kết quả
     output_path = os.path.join(app.config['OUTPUT_FOLDER'], output_name)
-    
     with open(output_path, "w", encoding="utf-8") as out:
-        for idx, file_path in enumerate(files, 1):
-            processing_status["current"] = idx
-            filename = os.path.basename(file_path)
-            log_queue.put(f"[{idx}/{len(files)}] Đang xử lý: {filename}")
-            
-            # Audio preprocessing
-            log_queue.put(f"  📊 Preprocessing audio...")
-            processed_path = preprocess_audio(file_path)
-            
-            # Transcribe với faster-whisper
-            log_queue.put(f"  🎤 Transcribing...")
-            segments, info = model.transcribe(
-                processed_path, 
-                language=language if language != "auto" else None,
-                beam_size=5  # Balance giữa tốc độ và chính xác
-            )
-            
-            # Combine segments
-            text = " ".join(segment.text for segment in segments).strip()
-            corrected = correct_text(text)
-            out.write(corrected + "\n\n")
-            log_queue.put(f"  ✅ Xong: {filename}")
+        out.write(proofread_text)
     
-    log_queue.put("🎉 DONE")
+    elapsed_time = time.time() - processing_status["start_time"]
+    processing_status["elapsed_time"] = elapsed_time
+    minutes, seconds = divmod(int(elapsed_time), 60)
+    log_queue.put(f"🎉 DONE - Thời gian hoàn thành: {minutes}m {seconds}s")
     processing_status["running"] = False
 
 @app.route('/')
